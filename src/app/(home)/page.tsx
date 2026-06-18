@@ -56,20 +56,20 @@ function FeaturedCard({
   return (
     <Link
       href={href}
-      className="group flex flex-col gap-3 rounded-xl border border-border dark:border-white/10 bg-card p-6 text-card-foreground shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
+      className="group flex flex-col gap-3 rounded-xl border border-border dark:border-white/10 bg-card p-6 text-card-foreground shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10"
     >
-      <span className="inline-flex w-fit items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+      <span className="inline-flex w-fit items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary transition-colors duration-300 group-hover:bg-primary/20">
         {tag}
       </span>
       <div className="flex-1">
-        <h3 className="mb-1 font-semibold text-base group-hover:text-primary transition-colors">
+        <h3 className="mb-1 font-semibold text-base transition-colors duration-300 group-hover:text-primary">
           {title}
         </h3>
         <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
       </div>
       <div className="flex items-center gap-1 text-xs font-medium text-primary mt-auto">
         Read more{' '}
-        <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+        <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-1.5" />
       </div>
     </Link>
   );
@@ -89,13 +89,16 @@ function DocCard({
   return (
     <Link
       href={href}
-      className="group flex flex-col gap-2.5 rounded-xl border border-border dark:border-white/10 bg-card p-5 text-card-foreground shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
+      className="group flex flex-col gap-2.5 rounded-xl border border-border dark:border-white/10 bg-card p-5 text-card-foreground shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10"
     >
-      <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
-          <Icon className="h-4.5 w-4.5" />
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110">
+            <Icon className="h-4.5 w-4.5" />
+          </div>
+          <h3 className="font-semibold text-sm leading-snug transition-colors duration-300 group-hover:text-primary">{title}</h3>
         </div>
-        <h3 className="font-semibold text-sm leading-snug">{title}</h3>
+        <ArrowRight className="h-4 w-4 shrink-0 text-primary opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0" />
       </div>
       <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
     </Link>
@@ -138,8 +141,7 @@ export default function HomePage() {
             Welcome to Documentation
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-            Everything you need to deploy, configure, and get the most out of Corespan
-            Systems — from quick-start guides to deep technical references.
+            Everything you need to deploy, configure, and get the most out of our platform — from quick-start guides to deep technical references.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <HeroButton href="/docs" variant="primary">
@@ -159,14 +161,14 @@ export default function HomePage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <FeaturedCard
               tag="New"
-              title="Getting Started with Corespan"
+              title="Getting Started with our Platform"
               description="A step-by-step walkthrough to set up your workspace and connect your first data source in minutes."
               href="/docs"
             />
             <FeaturedCard
               tag="Popular"
               title="Connector Setup Guide"
-              description="Learn how to integrate Corespan with your existing tools — Google Workspace, Slack, Confluence, and more."
+              description="Learn how to integrate our platform with your existing tools — Google Workspace, Slack, Confluence, and more."
               href="/docs"
             />
             <FeaturedCard
@@ -183,7 +185,7 @@ export default function HomePage() {
           <SectionHeader
             icon={Users}
             title="For Users"
-            description="Guides and resources to help you work smarter with Corespan every day."
+            description="Guides and resources to help you work smarter with our platform every day."
             color="bg-blue-500/10 text-blue-600 dark:text-blue-400"
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -209,7 +211,7 @@ export default function HomePage() {
               icon={Layers}
               title="Integrations"
               href="/docs"
-              description="Use Corespan inside the tools you already love — browser extension, Slack, and more."
+              description="Use our platform inside the tools you already love — browser extension, Slack, and more."
             />
           </div>
         </section>
@@ -219,7 +221,7 @@ export default function HomePage() {
           <SectionHeader
             icon={Settings}
             title="For Administrators"
-            description="Everything you need to deploy, configure, secure, and manage Corespan for your organization."
+            description="Everything you need to deploy, configure, secure, and manage our platform for your organization."
             color="bg-violet-500/10 text-violet-600 dark:text-violet-400"
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -257,7 +259,7 @@ export default function HomePage() {
               icon={Zap}
               title="Release Notes"
               href="/docs/release-notes"
-              description="Stay current with the latest features, improvements, and fixes across all Corespan products."
+              description="Stay current with the latest features, improvements, and fixes across all our products."
             />
           </div>
         </section>
@@ -267,7 +269,7 @@ export default function HomePage() {
           <SectionHeader
             icon={Code2}
             title="For Developers"
-            description="APIs, SDKs, and technical references to extend and integrate Corespan programmatically."
+            description="APIs, SDKs, and technical references to extend and integrate our platform programmatically."
             color="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -281,7 +283,7 @@ export default function HomePage() {
               icon={Code2}
               title="SDKs &amp; Libraries"
               href="/docs"
-              description="Official SDKs for Node.js, Python, and more to integrate Corespan into your applications."
+              description="Official SDKs for Node.js, Python, and more to integrate our platform into your applications."
             />
             <DocCard
               icon={Key}

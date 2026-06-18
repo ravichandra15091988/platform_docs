@@ -1,7 +1,7 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 
 export const gitConfig = {
-  user: 'corespan',
+  user: 'Platform Docs',
   repo: 'docs',
   branch: 'main',
 };
@@ -9,7 +9,7 @@ export const gitConfig = {
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: 'Corespan Docs',
+      title: 'Platform Docs',
       transparentMode: 'top',
     },
     links: [
