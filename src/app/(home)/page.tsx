@@ -133,12 +133,9 @@ export default function HomePage() {
       <section className="relative overflow-hidden border-b bg-gradient-to-br from-background via-accent/30 to-background">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,hsl(var(--primary)/0.12),transparent)]" />
         <div className="relative mx-auto max-w-5xl px-6 py-20 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur-sm">
-            <Zap className="h-3 w-3 text-primary" />
-            Documentation &amp; Knowledge Base
-          </div>
+
           <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
-            Welcome to Corespan Docs
+            Welcome to Documentation
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
             Everything you need to deploy, configure, and get the most out of Corespan
