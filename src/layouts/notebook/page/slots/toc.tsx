@@ -201,7 +201,9 @@ function PageTOCPopoverTrigger({ className, ...props }: ComponentProps<'button'>
   const t = useTranslations({ note: 'table of contents' });
   const { open } = use(TocPopoverContext)!;
   const items = Base.useItems();
-  const selectedIdx = items.findIndex((item) => item.active);
+  const activeAnchors = Base.useActiveAnchors();
+  const isActive = (item: (typeof items)[number]) => activeAnchors.includes(item.url.slice(1));
+  const selectedIdx = items.findIndex(isActive);
   const path = useTreePath().at(-1);
   const showItem = selectedIdx !== -1 && !open;
 
@@ -215,7 +217,7 @@ function PageTOCPopoverTrigger({ className, ...props }: ComponentProps<'button'>
       {...props}
     >
       <ProgressCircle
-        value={(items.findLastIndex((item) => item.active) + 1) / Math.max(1, items.length)}
+        value={(items.findLastIndex(isActive) + 1) / Math.max(1, items.length)}
         max={1}
         className={cn('shrink-0', open && 'text-fd-primary')}
       />
@@ -235,7 +237,7 @@ function PageTOCPopoverTrigger({ className, ...props }: ComponentProps<'button'>
             !showItem && 'opacity-0 translate-y-full pointer-events-none',
           )}
         >
-          {items[selectedIdx]?.original.title}
+          {items[selectedIdx]?.title}
         </span>
       </span>
       <ChevronDown className={cn('shrink-0 transition-transform mx-0.5', open && 'rotate-180')} />

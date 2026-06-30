@@ -177,7 +177,7 @@ function getLineOffset(depth: number): number {
 export function TOCItem({
   item,
   ...props
-}: Primitive.TOCItemProps & { item: Primitive.TOCItemType }) {
+}: Omit<Primitive.TOCItemProps, 'href'> & { item: Primitive.TOCItemType }) {
   const items = useTOCItems();
   const { isFirst, isLast, svg } = useMemo(() => {
     const index = items.indexOf(item);
