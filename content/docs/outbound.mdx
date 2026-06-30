@@ -1,0 +1,83 @@
+---
+title: Outbound Policies
+description: Configure rules that filter and route incoming tickets and events for ITSM and Security integrations.
+---
+
+## Overview
+
+The Outbound policies are a list of rules which control the incoming tickets based on the defined criteria during their configuration. For example, set your priority to `P0` and source to `Chronicle` — this rule ensures you receive the tickets pertaining to `P0` and originating from `Chronicle` when the defined criteria are met.
+
+The Outbound policies help you enhance the scalability, efficiency, and flexibility of the ITSM and SOAR integration workflow by removing the bottleneck processing at end-point services and by adding custom filters or rules.
+
+In addition, enabling Outbound policies allows you to scan the incoming events, filter, and route the events to the target service associated with the customer integration ID when the defined conditions match the specific events.
+
+<Callout title="Note">
+  The Outbound policies are applicable for ITSM (Jira, ServiceNow) and Security (Chronicle SOAR) integrations.
+</Callout>
+
+## How Outbound Policies Work
+
+The following sequence of actions takes place during the execution of the outbound policy:
+
+1. **Kafka Topic Consumption:** The `integration-acton-policy-lookup` service consumes data from the Kafka topic, serving as a centralized point of policy-based filtering.
+2. **Policy-Based Filtering:** The service references the customer-specific policies established through the `integration-acton-subscription-api`. If a policy aligns with the incoming data, event filtering occurs, ensuring that only relevant events proceed to the next step.
+3. **Target Service Processing:** Filtered events are directed to the appropriate target services (`actonIntegrationService` or `integrationConfigService`) based on the customer integration ID.
+
+## Outbound Policy Lookup Precedence
+
+For existing integrations, the defined outbound policies lookup for **tenant** level first, then **organization** level, and finally **domain** level. The priority of execution for outbound policies is highest for tenants, followed by organizations, and then domains.
+
+## Setting up Outbound Policies
+
+To set up the Outbound policies:
+
+1. Login to Resolution Intelligence with your credentials.
+2. Click the gear icon at the top (or) hover over the icon at the top left corner.
+3. At the bottom of the left menu, click **Configurations**.
+4. In the left menu, under **Data Ingestion**, click **Integrations**.
+5. Navigate to ITSM or Security integrations. For example, Jira.
+6. Enable the integration and complete the details in **Authentication** and **Tenant Mapping**.
+7. Click **Outbound Policy** and then click **Add Policy**. The **Add policy** screen opens.
+8. Enter a name and description (optional) for the Outbound Policy.
+9. Under the **Specify condition** section, construct the condition expression for your outbound policy. Select a field and operator from the drop-down lists. For the value, select a value from the drop-down list or enter it manually, depending on the field type. The condition is used to determine the records to which the rule will apply.
+
+   A condition expression can consist of several phrases, joined by an **And** or **Or**. For each phrase, select a field, operator, and value. Click the button to add an additional row. Use the parentheses and **And**/**Or** options to join the phrases together to form a condition expression.
+10. Click **Submit**.
+
+## Viewing an Outbound Policy
+
+To view an Outbound policy:
+
+1. Click the gear icon at the top (or) hover over the icon at the top left corner.
+2. At the bottom of the left menu, click **Configurations**.
+3. In the left menu, under **Data Ingestion**, click **Integrations**.
+4. Navigate to ITSM or Security integrations. For example, Jira.
+5. Click the **Outbound Policy**.
+6. In the policy listing page, click the desired policy (or) scroll right and click the three dots. A drop-down list opens.
+7. Click **View** to open your desired outbound policy.
+
+## Editing an Outbound Policy
+
+To edit an Outbound policy:
+
+1. Click the gear icon at the top (or) hover over the icon at the top left corner.
+2. At the bottom of the left menu, click **Configurations**.
+3. In the left menu, under **Data Ingestion**, click **Integrations**.
+4. Navigate to ITSM or Security integrations. For example, Jira.
+5. Click the **Outbound Policy**.
+6. In the policy listing page, scroll right and click the three dots. A drop-down list opens.
+7. Click **Edit**. An editing window opens.
+8. Edit the desired fields in the form.
+9. Click **Update** to save the changes.
+
+## Deleting an Outbound Policy
+
+To delete an Outbound policy:
+
+1. Click the gear icon at the top (or) hover over the icon at the top left corner.
+2. At the bottom of the left menu, click **Configurations**.
+3. In the left menu, under **Data Ingestion**, click **Integrations**.
+4. Navigate to ITSM or Security integrations. For example, Jira.
+5. Click the **Outbound Policy**.
+6. In the policy listing page, scroll right and click the three dots. A drop-down list opens (or) select the checkbox next to each policy that you would prefer to remove.
+7. Click **Delete**. The Outbound policy will be removed from the listing page.
