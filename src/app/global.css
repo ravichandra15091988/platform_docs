@@ -2,7 +2,6 @@
 @import 'fumadocs-ui/css/shadcn.css';
 @import 'fumadocs-ui/css/preset.css';
 
-
 :root {
   --color-fd-background: hsl(0, 0%, 96%);
   --color-fd-foreground: hsl(0, 0%, 3.9%);
@@ -20,6 +19,24 @@
   --color-fd-accent: hsla(0, 0%, 82%, 50%);
   --color-fd-accent-foreground: hsl(0, 0%, 9%);
   --color-fd-ring: hsl(0, 0%, 63.9%);
+}
+
+.rk-ledger {
+  --rk-bg: #f3f2f2;
+  --rk-surface: #eae9e9;
+  --rk-text: #201e1d;
+  --rk-accent-emphasis: #ae1800;
+  --rk-tag-bg: #f8f4f4;
+  --rk-tag-text: #444141;
+}
+
+.dark .rk-ledger {
+  --rk-bg: #201e1d;
+  --rk-surface: #2d2b2b;
+  --rk-text: #f3f2f2;
+  --rk-accent-emphasis: #ff9783;
+  --rk-tag-bg: #444141;
+  --rk-tag-text: #f8f4f4;
 }
 
 .dark {

@@ -17,7 +17,7 @@ const profile = {
   phone: '+91 83097 61339',
   location: 'Hyderabad, India',
   timezone: 'GMT+5:30',
-  writingSamplesUrl: 'https://github.com/ravichandra15091988/Writing-Samples/wiki',
+  writingSamplesUrl: '/docs',
 };
 
 const facts = [
@@ -149,19 +149,26 @@ const faqs = [
 
 const navFont = { fontFamily: 'var(--font-archivo), system-ui, sans-serif' };
 
+/* Muted-text and hairline-divider tones are derived from --rk-text via
+   color-mix, so they invert automatically with the dark-mode override
+   in global.css instead of needing a hardcoded shade per theme. */
+const muted = (pct: number) =>
+  `[color:color-mix(in_srgb,var(--rk-text)_${pct}%,transparent)]`;
+const divider = '[border-color:color-mix(in_srgb,var(--rk-text)_40%,transparent)]';
+
 function Hero() {
   return (
     <div className="px-6 pt-14 sm:px-10 sm:pt-16 md:px-14">
-      <span className="mb-5 block text-[13px] uppercase tracking-[0.08em] text-[#ae1800]">
+      <span className="mb-5 block text-[13px] uppercase tracking-[0.08em] text-[var(--rk-accent-emphasis)]">
         Portfolio · {profile.role}
       </span>
       <h1
-        className="mb-6 -ml-[0.04em] text-[42px] font-extrabold leading-[1.02] tracking-[-0.02em] whitespace-pre-line sm:text-[54px] md:text-[66px]"
+        className="mb-6 -ml-[0.04em] text-[42px] font-extrabold leading-[1.02] tracking-[-0.02em] whitespace-pre-line text-[var(--rk-text)] sm:text-[54px] md:text-[66px]"
         style={navFont}
       >
         {profile.headline}
       </h1>
-      <p className="mb-8 max-w-[60ch] text-lg leading-relaxed text-[#201e1d]/80">
+      <p className={`mb-8 max-w-[60ch] text-lg leading-relaxed ${muted(80)}`}>
         {profile.tagline}
       </p>
       <div className="flex flex-wrap gap-3">
@@ -174,9 +181,7 @@ function Hero() {
         </a>
         <a
           href={profile.writingSamplesUrl}
-          target="_blank"
-          rel="noopener"
-          className="inline-flex items-center justify-center border border-[#201e1d]/40 px-3.5 py-2 text-sm font-extrabold text-[#201e1d] hover:bg-[#201e1d]/[0.07]"
+          className={`inline-flex items-center justify-center border ${divider} px-3.5 py-2 text-sm font-extrabold text-[var(--rk-text)] hover:[background-color:color-mix(in_srgb,var(--rk-text)_7%,transparent)]`}
           style={navFont}
         >
           View writing samples
@@ -189,23 +194,25 @@ function Hero() {
 function FactTable() {
   return (
     <div className="px-6 pt-12 sm:px-10 md:px-14">
-      <div className="grid grid-cols-2 border-t-2 border-[#201e1d]/40 sm:grid-cols-4">
+      <div className={`grid grid-cols-2 border-t-2 ${divider} sm:grid-cols-4`}>
         {facts.map((fact, i) => (
           <div
             key={fact.label}
             className={[
               'py-5',
-              i % 2 === 0 ? 'pr-3 border-r border-[#201e1d]/40' : 'pl-3',
-              i < 2 ? 'border-b border-[#201e1d]/40 sm:border-b-0' : '',
-              i < facts.length - 1 ? 'sm:pr-5 sm:border-r sm:border-[#201e1d]/40' : '',
+              i % 2 === 0 ? `pr-3 border-r ${divider}` : 'pl-3',
+              i < 2 ? `border-b ${divider} sm:border-b-0` : '',
+              i < facts.length - 1 ? `sm:pr-5 sm:border-r ${divider}` : '',
               i % 2 !== 0 ? 'sm:pl-5' : '',
             ].join(' ')}
           >
-            <div className="mb-2 text-xs uppercase tracking-[0.08em] text-[#201e1d]/60">
+            <div className={`mb-2 text-xs uppercase tracking-[0.08em] ${muted(60)}`}>
               {fact.label}
             </div>
             <div
-              className={`text-base font-extrabold sm:text-[17px] ${fact.accent ? 'text-[#ae1800]' : ''}`}
+              className={`text-base font-extrabold sm:text-[17px] ${
+                fact.accent ? 'text-[var(--rk-accent-emphasis)]' : 'text-[var(--rk-text)]'
+              }`}
               style={navFont}
             >
               {fact.value}
@@ -229,7 +236,7 @@ function StatRow() {
             >
               {stat.value}
             </div>
-            <div className="text-[13px] tracking-[0.06em] uppercase text-[#201e1d]/62">
+            <div className={`text-[13px] tracking-[0.06em] uppercase ${muted(62)}`}>
               {stat.label}
             </div>
           </div>
@@ -240,7 +247,11 @@ function StatRow() {
 }
 
 function Divider() {
-  return <hr className="mx-6 h-0.5 border-0 bg-[#201e1d]/40 sm:mx-10 md:mx-14" />;
+  return (
+    <hr
+      className="mx-6 h-0.5 border-0 sm:mx-10 md:mx-14 [background-color:color-mix(in_srgb,var(--rk-text)_40%,transparent)]"
+    />
+  );
 }
 
 type CareerTab = 'experience' | 'skills' | 'awards';
@@ -250,18 +261,18 @@ function CareerSection() {
 
   const tabClass = (active: boolean) =>
     `-mb-0.5 cursor-pointer border-b-2 pb-3.5 text-[15px] font-extrabold tracking-[0.02em] transition-colors ${
-      active ? 'border-[#ec3013] text-[#201e1d]' : 'border-transparent text-[#201e1d]/52'
+      active ? `border-[#ec3013] text-[var(--rk-text)]` : `border-transparent ${muted(52)}`
     }`;
 
   return (
     <div id="experience" className="scroll-mt-20 px-6 py-12 sm:px-10 md:px-14">
       <h2
-        className="mb-7 text-[15px] uppercase tracking-[0.08em] text-[#ae1800]"
+        className="mb-7 text-[15px] uppercase tracking-[0.08em] text-[var(--rk-accent-emphasis)]"
         style={navFont}
       >
         Career
       </h2>
-      <div className="mb-2 flex gap-8 border-b-2 border-[#201e1d]/40">
+      <div className={`mb-2 flex gap-8 border-b-2 ${divider}`}>
         <button type="button" className={tabClass(tab === 'experience')} style={navFont} onClick={() => setTab('experience')}>
           Experience
         </button>
@@ -278,18 +289,18 @@ function CareerSection() {
           {experience.map((job) => (
             <div
               key={job.role + job.company}
-              className="grid grid-cols-1 items-baseline gap-1.5 border-t border-[#201e1d]/40 py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-6"
+              className="grid grid-cols-1 items-baseline gap-1.5 border-t [border-color:color-mix(in_srgb,var(--rk-text)_40%,transparent)] py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-6"
             >
               <div>
-                <div className="text-lg font-extrabold" style={navFont}>
+                <div className="text-lg font-extrabold text-[var(--rk-text)]" style={navFont}>
                   {job.role} · {job.company}
                   {job.companyNote ? (
-                    <span className="text-[#ae1800]"> {job.companyNote}</span>
+                    <span className="text-[var(--rk-accent-emphasis)]"> {job.companyNote}</span>
                   ) : null}
                 </div>
-                <div className="mt-1.5 text-sm text-[#201e1d]/65">{job.description}</div>
+                <div className="mt-1.5 text-sm [color:color-mix(in_srgb,var(--rk-text)_65%,transparent)]">{job.description}</div>
               </div>
-              <div className="text-[13px] whitespace-nowrap text-[#201e1d]/55 tabular-nums">
+              <div className="text-[13px] whitespace-nowrap [color:color-mix(in_srgb,var(--rk-text)_55%,transparent)] tabular-nums">
                 {job.period}
               </div>
             </div>
@@ -302,12 +313,12 @@ function CareerSection() {
           {skillGroups.map((group) => (
             <div
               key={group.label}
-              className="grid grid-cols-1 items-baseline gap-3 border-t border-[#201e1d]/40 py-5 sm:grid-cols-[220px_minmax(0,1fr)] sm:gap-8"
+              className="grid grid-cols-1 items-baseline gap-3 border-t [border-color:color-mix(in_srgb,var(--rk-text)_40%,transparent)] py-5 sm:grid-cols-[220px_minmax(0,1fr)] sm:gap-8"
             >
-              <div className="text-[17px] font-extrabold" style={navFont}>
+              <div className="text-[17px] font-extrabold text-[var(--rk-text)]" style={navFont}>
                 {group.label}
               </div>
-              <div className="text-[15px] text-[#201e1d]/72">{group.value}</div>
+              <div className="text-[15px] [color:color-mix(in_srgb,var(--rk-text)_72%,transparent)]">{group.value}</div>
             </div>
           ))}
         </div>
@@ -318,15 +329,15 @@ function CareerSection() {
           {awards.map((award) => (
             <div
               key={award.title}
-              className="grid grid-cols-1 items-baseline gap-1.5 border-t border-[#201e1d]/40 py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-6"
+              className="grid grid-cols-1 items-baseline gap-1.5 border-t [border-color:color-mix(in_srgb,var(--rk-text)_40%,transparent)] py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-6"
             >
               <div>
-                <div className="text-lg font-extrabold" style={navFont}>
+                <div className="text-lg font-extrabold text-[var(--rk-text)]" style={navFont}>
                   {award.title}
                 </div>
-                <div className="mt-1.5 text-sm text-[#201e1d]/65">{award.description}</div>
+                <div className="mt-1.5 text-sm [color:color-mix(in_srgb,var(--rk-text)_65%,transparent)]">{award.description}</div>
               </div>
-              <div className="text-[13px] whitespace-nowrap text-[#201e1d]/55 tabular-nums">
+              <div className="text-[13px] whitespace-nowrap [color:color-mix(in_srgb,var(--rk-text)_55%,transparent)] tabular-nums">
                 {award.period}
               </div>
             </div>
@@ -341,32 +352,32 @@ function EducationSection() {
   return (
     <div id="education" className="scroll-mt-20 px-6 py-12 sm:px-10 md:px-14">
       <h2
-        className="mb-7 text-[15px] uppercase tracking-[0.08em] text-[#ae1800]"
+        className="mb-7 text-[15px] uppercase tracking-[0.08em] text-[var(--rk-accent-emphasis)]"
         style={navFont}
       >
         Education &amp; background
       </h2>
       <div className="grid grid-cols-1 gap-0 sm:grid-cols-2 sm:gap-x-10">
-        <div className="border-t-2 border-[#201e1d]/40 py-6">
-          <p className="mb-2 text-xl leading-tight font-extrabold tracking-[-0.01em]" style={navFont}>
+        <div className="border-t-2 [border-color:color-mix(in_srgb,var(--rk-text)_40%,transparent)] py-6">
+          <p className="mb-2 text-xl leading-tight font-extrabold tracking-[-0.01em] text-[var(--rk-text)]" style={navFont}>
             {education.degree}
           </p>
-          <p className="text-sm text-[#201e1d]/62">{education.school}</p>
+          <p className="text-sm [color:color-mix(in_srgb,var(--rk-text)_62%,transparent)]">{education.school}</p>
         </div>
-        <div className="border-t-2 border-[#201e1d]/40 py-6">
-          <p className="mb-2 text-xl leading-tight font-extrabold tracking-[-0.01em]" style={navFont}>
+        <div className="border-t-2 [border-color:color-mix(in_srgb,var(--rk-text)_40%,transparent)] py-6">
+          <p className="mb-2 text-xl leading-tight font-extrabold tracking-[-0.01em] text-[var(--rk-text)]" style={navFont}>
             {education.note.title}
           </p>
-          <p className="text-sm text-[#201e1d]/72">{education.note.body}</p>
+          <p className="text-sm [color:color-mix(in_srgb,var(--rk-text)_72%,transparent)]">{education.note.body}</p>
         </div>
       </div>
-      <div className="mt-2 border-t-2 border-[#201e1d]/40 pt-7">
-        <div className="mb-4 text-xs uppercase tracking-[0.08em] text-[#201e1d]/55">
+      <div className="mt-2 border-t-2 [border-color:color-mix(in_srgb,var(--rk-text)_40%,transparent)] pt-7">
+        <div className="mb-4 text-xs uppercase tracking-[0.08em] [color:color-mix(in_srgb,var(--rk-text)_55%,transparent)]">
           Companies &amp; clients
         </div>
         <div className="flex flex-wrap gap-3.5">
           {companies.map((company) => (
-            <span key={company} className="bg-[#f8f4f4] px-2.5 py-1 text-[11px] text-[#444141]">
+            <span key={company} className="bg-[var(--rk-tag-bg)] px-2.5 py-1 text-[11px] text-[var(--rk-tag-text)]">
               {company}
             </span>
           ))}
@@ -382,7 +393,7 @@ function FaqSection() {
   return (
     <div id="faq" className="scroll-mt-20 px-6 py-12 sm:px-10 md:px-14">
       <h2
-        className="mb-2 text-[15px] uppercase tracking-[0.08em] text-[#ae1800]"
+        className="mb-2 text-[15px] uppercase tracking-[0.08em] text-[var(--rk-accent-emphasis)]"
         style={navFont}
       >
         For recruiters
@@ -390,11 +401,11 @@ function FaqSection() {
       {faqs.map((item, i) => {
         const open = openIndex === i;
         return (
-          <div key={item.q} className="border-t border-[#201e1d]/40">
+          <div key={item.q} className="border-t [border-color:color-mix(in_srgb,var(--rk-text)_40%,transparent)]">
             <button
               type="button"
               onClick={() => setOpenIndex(open ? null : i)}
-              className="flex w-full cursor-pointer items-center justify-between gap-4 py-5 text-left text-lg font-extrabold text-[#201e1d]"
+              className="flex w-full cursor-pointer items-center justify-between gap-4 py-5 text-left text-lg font-extrabold text-[var(--rk-text)]"
               style={navFont}
             >
               <span>{item.q}</span>
@@ -414,7 +425,7 @@ function FaqSection() {
               </svg>
             </button>
             {open && (
-              <p className="max-w-[64ch] pb-6 text-base leading-relaxed text-[#201e1d]/78">
+              <p className="max-w-[64ch] pb-6 text-base leading-relaxed [color:color-mix(in_srgb,var(--rk-text)_78%,transparent)]">
                 {item.a}
               </p>
             )}
@@ -431,30 +442,28 @@ function ContactSection() {
   return (
     <div id="contact" className="scroll-mt-20 px-6 py-12 sm:px-10 md:px-14 md:pb-16">
       <h2
-        className="mb-5 text-[15px] uppercase tracking-[0.08em] text-[#ae1800]"
+        className="mb-5 text-[15px] uppercase tracking-[0.08em] text-[var(--rk-accent-emphasis)]"
         style={navFont}
       >
         Start a conversation
       </h2>
-      <div className="mb-7 flex flex-wrap gap-x-7 gap-y-2 text-sm text-[#201e1d]/72">
+      <div className="mb-7 flex flex-wrap gap-x-7 gap-y-2 text-sm [color:color-mix(in_srgb,var(--rk-text)_72%,transparent)]">
         <span>{profile.email}</span>
         <span>{profile.phone}</span>
         <a
           href={profile.writingSamplesUrl}
-          target="_blank"
-          rel="noopener"
-          className="text-[#ae1800] hover:text-[#ec3013]"
+          className="text-[var(--rk-accent-emphasis)] hover:text-[#ec3013]"
         >
-          Writing samples ↗
+          Writing samples
         </a>
       </div>
 
       {sent ? (
         <div className="border-t-2 border-[#ec3013] py-8">
-          <p className="mb-2 text-2xl font-extrabold" style={navFont}>
+          <p className="mb-2 text-2xl font-extrabold text-[var(--rk-text)]" style={navFont}>
             Thanks — message received.
           </p>
-          <p className="text-base text-[#201e1d]/70">
+          <p className="text-base [color:color-mix(in_srgb,var(--rk-text)_70%,transparent)]">
             I reply to every recruiter within two business days.
           </p>
         </div>
@@ -467,44 +476,44 @@ function ContactSection() {
           className="grid max-w-[720px] grid-cols-1 gap-5 sm:grid-cols-2"
         >
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="rk-name" className="text-xs text-[#201e1d]/70">
+            <label htmlFor="rk-name" className="text-xs [color:color-mix(in_srgb,var(--rk-text)_70%,transparent)]">
               Your name
             </label>
             <input
               id="rk-name"
               required
-              className="min-h-9 border border-[#201e1d]/40 bg-[#eae9e9] px-2.5 py-1.5 text-sm text-[#201e1d] outline-none focus-visible:border-[#ec3013]"
+              className="min-h-9 border [border-color:color-mix(in_srgb,var(--rk-text)_40%,transparent)] bg-[var(--rk-surface)] px-2.5 py-1.5 text-sm text-[var(--rk-text)] outline-none focus-visible:border-[#ec3013]"
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="rk-co" className="text-xs text-[#201e1d]/70">
+            <label htmlFor="rk-co" className="text-xs [color:color-mix(in_srgb,var(--rk-text)_70%,transparent)]">
               Company
             </label>
             <input
               id="rk-co"
-              className="min-h-9 border border-[#201e1d]/40 bg-[#eae9e9] px-2.5 py-1.5 text-sm text-[#201e1d] outline-none focus-visible:border-[#ec3013]"
+              className="min-h-9 border [border-color:color-mix(in_srgb,var(--rk-text)_40%,transparent)] bg-[var(--rk-surface)] px-2.5 py-1.5 text-sm text-[var(--rk-text)] outline-none focus-visible:border-[#ec3013]"
             />
           </div>
           <div className="flex flex-col gap-1.5 sm:col-span-2">
-            <label htmlFor="rk-email" className="text-xs text-[#201e1d]/70">
+            <label htmlFor="rk-email" className="text-xs [color:color-mix(in_srgb,var(--rk-text)_70%,transparent)]">
               Work email
             </label>
             <input
               id="rk-email"
               type="email"
               required
-              className="min-h-9 border border-[#201e1d]/40 bg-[#eae9e9] px-2.5 py-1.5 text-sm text-[#201e1d] outline-none focus-visible:border-[#ec3013]"
+              className="min-h-9 border [border-color:color-mix(in_srgb,var(--rk-text)_40%,transparent)] bg-[var(--rk-surface)] px-2.5 py-1.5 text-sm text-[var(--rk-text)] outline-none focus-visible:border-[#ec3013]"
             />
           </div>
           <div className="flex flex-col gap-1.5 sm:col-span-2">
-            <label htmlFor="rk-msg" className="text-xs text-[#201e1d]/70">
+            <label htmlFor="rk-msg" className="text-xs [color:color-mix(in_srgb,var(--rk-text)_70%,transparent)]">
               The role
             </label>
             <textarea
               id="rk-msg"
               rows={3}
               placeholder="Team, level, and what you're hiring for."
-              className="resize-y border border-[#201e1d]/40 bg-[#eae9e9] px-2.5 py-1.5 text-sm text-[#201e1d] outline-none focus-visible:border-[#ec3013]"
+              className="resize-y border [border-color:color-mix(in_srgb,var(--rk-text)_40%,transparent)] bg-[var(--rk-surface)] px-2.5 py-1.5 text-sm text-[var(--rk-text)] outline-none focus-visible:border-[#ec3013]"
             />
           </div>
           <div className="sm:col-span-2">
@@ -524,7 +533,7 @@ function ContactSection() {
 
 function Footer() {
   return (
-    <div className="px-6 py-7 text-[13px] text-[#201e1d]/60 sm:px-10 md:px-14">
+    <div className="px-6 py-7 text-[13px] [color:color-mix(in_srgb,var(--rk-text)_60%,transparent)] sm:px-10 md:px-14">
       © 2026 {profile.brand} · {profile.email} · {profile.location}
     </div>
   );
@@ -532,7 +541,7 @@ function Footer() {
 
 export default function HomePage() {
   return (
-    <main className="w-full bg-[#f3f2f2]" style={navFont}>
+    <main className="rk-ledger w-full bg-[var(--rk-bg)]" style={navFont}>
       <div className="w-full">
         <Hero />
         <FactTable />
