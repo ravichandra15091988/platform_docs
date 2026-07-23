@@ -1,16 +1,6 @@
-import Link from 'next/link';
-import {
-  ArrowRight,
-  Briefcase,
-  FolderGit2,
-  Trophy,
-  Mail,
-  Github,
-  Linkedin,
-  ExternalLink,
-  MapPin,
-  Calendar,
-} from 'lucide-react';
+'use client';
+
+import { useState } from 'react';
 
 /* ──────────────────────────────────────────────────────────────────────────
    EDIT YOUR CONTENT HERE
@@ -18,293 +8,545 @@ import {
    ────────────────────────────────────────────────────────────────────────── */
 
 const profile = {
-  name: 'Ravichandra Kandregula',
+  brand: 'Ravichandra K',
   role: 'Senior Technical Writer',
+  headline: 'Docs people\nactually read.',
   tagline:
-    'I build reliable web platforms and developer tools — turning complex problems into clean, maintainable products.',
-  location: 'India',
-  email: '[EMAIL_ADDRESS]',
-  github: 'https://github.com/ravichandra15091988',
-  linkedin: 'https://www.linkedin.com/in/ravichandra-k',
+    'A seasoned technical writer with 6+ years in software documentation and 14+ years across software and manufacturing. An engineering background sits behind every doc — turning complex products into clear, accurate technical content teams can trust.',
+  email: 'ravi.metrockz@gmail.com',
+  phone: '+91 83097 61339',
+  location: 'Hyderabad, India',
+  timezone: 'GMT+5:30',
+  writingSamplesUrl: 'https://github.com/ravichandra15091988/Writing-Samples/wiki',
 };
 
-const skills = [
-  'Technical Writing',
-  'Content Strategy',
-  'DITA',
-  'Markdown',
-  'API Documentation',
-  'REST APIs',
+const facts = [
+  { label: 'Location', value: 'Hyderabad, India · GMT+5:30' },
+  { label: 'Focus', value: 'API & product docs' },
+  { label: 'Availability', value: 'Open to roles', accent: true },
+  { label: 'Experience', value: '6+ yrs writing' },
+];
+
+const stats = [
+  { value: '14+', label: 'years total experience' },
+  { value: '+60%', label: 'user satisfaction, Google project' },
+  { value: '+90%', label: 'document accuracy via peer review' },
+  { value: '+25%', label: 'engagement on Wisely docs' },
 ];
 
 const experience = [
   {
-    role: 'Senior Software Engineer',
-    company: 'Corespan',
-    period: '2023 — Present',
-    location: 'Remote',
-    points: [
-      'Led development of the core documentation and API platform used across the organization.',
-      'Designed and shipped integrations consuming third-party REST APIs at scale.',
-      'Mentored engineers and established code-review and testing standards.',
-    ],
+    role: 'Technical Writer III',
+    company: 'Tanla Platforms',
+    period: '2024–Now',
+    description:
+      'Owns Wisely messaging-platform docs in Document360; built API docs in Postman + Azure DevOps; +25% engagement via analytics.',
   },
   {
-    role: 'Software Engineer',
-    company: 'Previous Company',
-    period: '2020 — 2023',
-    location: 'Hyderabad, India',
-    points: [
-      'Built and maintained customer-facing web applications with React and Node.js.',
-      'Improved page performance and reduced load times by optimizing data fetching.',
-    ],
+    role: 'Senior Technical Writer',
+    company: 'Netenrich',
+    period: '2021–24',
+    description:
+      'Documented Resolution Intelligence Cloud (cybersecurity) in Zendesk — help, release notes, UX microcopy, FAQs and SEO.',
+  },
+  {
+    role: 'Senior Technical Writer',
+    company: 'Blaize',
+    period: '2021',
+    description:
+      'AI Studio docs in Adobe RoboHelp; SDK/eSDK docs for Picasso cards via AsciiDoc + GitHub; install & getting-started guides.',
+  },
+  {
+    role: 'Technical Writer',
+    company: 'Rahi Systems',
+    companyNote: '(Client: Google)',
+    period: '2019–21',
+    description:
+      'Networking user manuals in Cider + Markdown — +60% user satisfaction, +90% doc accuracy; Rackdoc architecture diagrams.',
+  },
+  {
+    role: 'Process Engineer',
+    company: 'Cyient',
+    period: '2013–19',
+    description: 'Authored SOPs and statements of work for client Pratt & Whitney.',
+  },
+  {
+    role: 'Process Engineer',
+    company: 'Larsen & Toubro',
+    period: '2010–12',
+    description:
+      'SOPs and SoWs for plant technicians; Associate of the Year for winning a new project assignment.',
   },
 ];
 
-const projects = [
+const skillGroups = [
+  { label: 'Authoring & markup', value: 'Markdown · HTML · CSS · AsciiDoc · DITA XML · OpenAPI Spec' },
+  { label: 'Docs platforms', value: 'Document360 · Zendesk · Adobe RoboHelp · mkdocs · Postman' },
+  { label: 'Programming & data', value: 'Python (NumPy, Pandas) · SQL' },
+  { label: 'Diagrams & capture', value: 'MS Visio · Lucidchart · OmniGraffle · Snagit' },
   {
-    title: 'NASA APOD API',
-    description:
-      "A space-themed card that uses NASA's APOD API to fetch the Astronomy Picture of the Day.",
-    href: '/docs/nasa_api',
-  },
-  {
-    title: 'Introducing Akshaya Pathra',
-    description:
-      'An intelligent, AI-enabled cooking companion that recreates home-style multi-cuisine recipes in your kitchen.',
-    href: '/docs/akshaya_patra',
-  },
-  {
-    title: 'Outbound Policies',
-    description:
-      'Configure rules that filter and route incoming tickets and events for ITSM and Security integrations.',
-    href: '/docs/outbound',
+    label: 'Collaboration & VCS',
+    value: 'GitHub · Bitbucket · Azure DevOps · Atlassian Jira · SharePoint · Agile Scrum',
   },
 ];
 
-const achievements = [
+const awards = [
   {
-    title: 'Launched Company Documentation Platform',
-    year: '2025',
-    description:
-      'Designed and delivered the end-to-end documentation experience now used company-wide.',
+    title: 'STC India Chapter Competition',
+    description: 'Won two prizes for technical writing.',
+    period: '2020',
   },
   {
-    title: 'Performance Optimization Initiative',
-    year: '2024',
-    description:
-      'Reduced application load times significantly through systematic profiling and caching.',
+    title: 'Big Data Analytics & Optimization',
+    description: 'Certificate program at INSOFE.',
+    period: '2016–17',
   },
   {
-    title: 'Open Source Contributions',
-    year: '2023',
-    description:
-      'Contributed fixes and improvements to community projects and internal tooling.',
+    title: 'Associate of the Year · Larsen & Toubro',
+    description: 'For a plan that won a new project assignment from an existing client.',
+    period: '2011',
+  },
+];
+
+const education = {
+  degree: 'B.Tech, Metallurgy',
+  school: 'JNTU Hyderabad · 2010 · 68.7%',
+  note: {
+    title: 'An engineer who writes',
+    body: 'Years as a process engineer before technical writing — so docs come from real understanding, not just the ticket.',
+  },
+};
+
+const companies = [
+  'Tanla Platforms',
+  'Netenrich',
+  'Blaize',
+  'Rahi Systems · Google',
+  'Cyient',
+  'Larsen & Toubro',
+];
+
+const faqs = [
+  {
+    q: 'What roles are you looking for?',
+    a: 'Senior or lead technical-writing roles owning developer and product documentation — API references, SDK guides, and help content. Open to remote and hybrid.',
+  },
+  {
+    q: "What's your toolkit?",
+    a: 'Document360, Zendesk, Adobe RoboHelp, and mkdocs for authoring and publishing; Postman and OpenAPI for API docs; Markdown, AsciiDoc, and DITA XML for content; Git, Azure DevOps, and Jira for workflow — plus Python and SQL for data.',
+  },
+  {
+    q: "What's your background?",
+    a: 'A B.Tech in Metallurgy and years as a process engineer before technical writing, so I write from real engineering understanding rather than just the ticket.',
+  },
+  {
+    q: 'Where are you based?',
+    a: 'Hyderabad, India (GMT+5:30). Comfortable across global overlap hours and used to distributed, agile teams.',
   },
 ];
 
 /* ────────────────────────────────────────────────────────────────────────── */
 
-function SectionHeader({
-  icon: Icon,
-  title,
-  description,
-  color,
-}: {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  color: string;
-}) {
+const navFont = { fontFamily: 'var(--font-archivo), system-ui, sans-serif' };
+
+function Hero() {
   return (
-    <div className="flex items-start gap-4 mb-8">
-      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${color}`}>
-        <Icon className="h-5 w-5" />
-      </div>
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">{description}</p>
+    <div className="px-6 pt-14 sm:px-10 sm:pt-16 md:px-14">
+      <span className="mb-5 block text-[13px] uppercase tracking-[0.08em] text-[#ae1800]">
+        Portfolio · {profile.role}
+      </span>
+      <h1
+        className="mb-6 -ml-[0.04em] text-[42px] font-extrabold leading-[1.02] tracking-[-0.02em] whitespace-pre-line sm:text-[54px] md:text-[66px]"
+        style={navFont}
+      >
+        {profile.headline}
+      </h1>
+      <p className="mb-8 max-w-[60ch] text-lg leading-relaxed text-[#201e1d]/80">
+        {profile.tagline}
+      </p>
+      <div className="flex flex-wrap gap-3">
+        <a
+          href="#contact"
+          className="inline-flex items-center justify-center bg-[#ec3013] px-3.5 py-2 text-sm font-extrabold text-[#f3f2f2] hover:bg-[#dd2b0f] active:bg-[#ae1800]"
+          style={navFont}
+        >
+          Get in touch
+        </a>
+        <a
+          href={profile.writingSamplesUrl}
+          target="_blank"
+          rel="noopener"
+          className="inline-flex items-center justify-center border border-[#201e1d]/40 px-3.5 py-2 text-sm font-extrabold text-[#201e1d] hover:bg-[#201e1d]/[0.07]"
+          style={navFont}
+        >
+          View writing samples
+        </a>
       </div>
     </div>
   );
 }
 
-function SocialLink({
-  href,
-  icon: Icon,
-  label,
-}: {
-  href: string;
-  icon: React.ElementType;
-  label: string;
-}) {
+function FactTable() {
   return (
-    <Link
-      href={href}
-      target={href.startsWith('http') ? '_blank' : undefined}
-      className="inline-flex items-center gap-2 rounded-lg border bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-all hover:bg-accent hover:shadow-md"
-    >
-      <Icon className="h-4 w-4" />
-      {label}
-    </Link>
+    <div className="px-6 pt-12 sm:px-10 md:px-14">
+      <div className="grid grid-cols-2 border-t-2 border-[#201e1d]/40 sm:grid-cols-4">
+        {facts.map((fact, i) => (
+          <div
+            key={fact.label}
+            className={[
+              'py-5',
+              i % 2 === 0 ? 'pr-3 border-r border-[#201e1d]/40' : 'pl-3',
+              i < 2 ? 'border-b border-[#201e1d]/40 sm:border-b-0' : '',
+              i < facts.length - 1 ? 'sm:pr-5 sm:border-r sm:border-[#201e1d]/40' : '',
+              i % 2 !== 0 ? 'sm:pl-5' : '',
+            ].join(' ')}
+          >
+            <div className="mb-2 text-xs uppercase tracking-[0.08em] text-[#201e1d]/60">
+              {fact.label}
+            </div>
+            <div
+              className={`text-base font-extrabold sm:text-[17px] ${fact.accent ? 'text-[#ae1800]' : ''}`}
+              style={navFont}
+            >
+              {fact.value}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StatRow() {
+  return (
+    <div className="px-6 py-12 sm:px-10 md:px-14">
+      <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+        {stats.map((stat) => (
+          <div key={stat.label}>
+            <div
+              className="mb-3 text-4xl leading-none font-extrabold text-[#ec3013] tabular-nums"
+              style={navFont}
+            >
+              {stat.value}
+            </div>
+            <div className="text-[13px] tracking-[0.06em] uppercase text-[#201e1d]/62">
+              {stat.label}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Divider() {
+  return <hr className="mx-6 h-0.5 border-0 bg-[#201e1d]/40 sm:mx-10 md:mx-14" />;
+}
+
+type CareerTab = 'experience' | 'skills' | 'awards';
+
+function CareerSection() {
+  const [tab, setTab] = useState<CareerTab>('experience');
+
+  const tabClass = (active: boolean) =>
+    `-mb-0.5 cursor-pointer border-b-2 pb-3.5 text-[15px] font-extrabold tracking-[0.02em] transition-colors ${
+      active ? 'border-[#ec3013] text-[#201e1d]' : 'border-transparent text-[#201e1d]/52'
+    }`;
+
+  return (
+    <div id="experience" className="scroll-mt-20 px-6 py-12 sm:px-10 md:px-14">
+      <h2
+        className="mb-7 text-[15px] uppercase tracking-[0.08em] text-[#ae1800]"
+        style={navFont}
+      >
+        Career
+      </h2>
+      <div className="mb-2 flex gap-8 border-b-2 border-[#201e1d]/40">
+        <button type="button" className={tabClass(tab === 'experience')} style={navFont} onClick={() => setTab('experience')}>
+          Experience
+        </button>
+        <button type="button" className={tabClass(tab === 'skills')} style={navFont} onClick={() => setTab('skills')}>
+          Skills &amp; tools
+        </button>
+        <button type="button" className={tabClass(tab === 'awards')} style={navFont} onClick={() => setTab('awards')}>
+          Awards &amp; certs
+        </button>
+      </div>
+
+      {tab === 'experience' && (
+        <div>
+          {experience.map((job) => (
+            <div
+              key={job.role + job.company}
+              className="grid grid-cols-1 items-baseline gap-1.5 border-t border-[#201e1d]/40 py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-6"
+            >
+              <div>
+                <div className="text-lg font-extrabold" style={navFont}>
+                  {job.role} · {job.company}
+                  {job.companyNote ? (
+                    <span className="text-[#ae1800]"> {job.companyNote}</span>
+                  ) : null}
+                </div>
+                <div className="mt-1.5 text-sm text-[#201e1d]/65">{job.description}</div>
+              </div>
+              <div className="text-[13px] whitespace-nowrap text-[#201e1d]/55 tabular-nums">
+                {job.period}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tab === 'skills' && (
+        <div>
+          {skillGroups.map((group) => (
+            <div
+              key={group.label}
+              className="grid grid-cols-1 items-baseline gap-3 border-t border-[#201e1d]/40 py-5 sm:grid-cols-[220px_minmax(0,1fr)] sm:gap-8"
+            >
+              <div className="text-[17px] font-extrabold" style={navFont}>
+                {group.label}
+              </div>
+              <div className="text-[15px] text-[#201e1d]/72">{group.value}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tab === 'awards' && (
+        <div>
+          {awards.map((award) => (
+            <div
+              key={award.title}
+              className="grid grid-cols-1 items-baseline gap-1.5 border-t border-[#201e1d]/40 py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-6"
+            >
+              <div>
+                <div className="text-lg font-extrabold" style={navFont}>
+                  {award.title}
+                </div>
+                <div className="mt-1.5 text-sm text-[#201e1d]/65">{award.description}</div>
+              </div>
+              <div className="text-[13px] whitespace-nowrap text-[#201e1d]/55 tabular-nums">
+                {award.period}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EducationSection() {
+  return (
+    <div id="education" className="scroll-mt-20 px-6 py-12 sm:px-10 md:px-14">
+      <h2
+        className="mb-7 text-[15px] uppercase tracking-[0.08em] text-[#ae1800]"
+        style={navFont}
+      >
+        Education &amp; background
+      </h2>
+      <div className="grid grid-cols-1 gap-0 sm:grid-cols-2 sm:gap-x-10">
+        <div className="border-t-2 border-[#201e1d]/40 py-6">
+          <p className="mb-2 text-xl leading-tight font-extrabold tracking-[-0.01em]" style={navFont}>
+            {education.degree}
+          </p>
+          <p className="text-sm text-[#201e1d]/62">{education.school}</p>
+        </div>
+        <div className="border-t-2 border-[#201e1d]/40 py-6">
+          <p className="mb-2 text-xl leading-tight font-extrabold tracking-[-0.01em]" style={navFont}>
+            {education.note.title}
+          </p>
+          <p className="text-sm text-[#201e1d]/72">{education.note.body}</p>
+        </div>
+      </div>
+      <div className="mt-2 border-t-2 border-[#201e1d]/40 pt-7">
+        <div className="mb-4 text-xs uppercase tracking-[0.08em] text-[#201e1d]/55">
+          Companies &amp; clients
+        </div>
+        <div className="flex flex-wrap gap-3.5">
+          {companies.map((company) => (
+            <span key={company} className="bg-[#f8f4f4] px-2.5 py-1 text-[11px] text-[#444141]">
+              {company}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FaqSection() {
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  return (
+    <div id="faq" className="scroll-mt-20 px-6 py-12 sm:px-10 md:px-14">
+      <h2
+        className="mb-2 text-[15px] uppercase tracking-[0.08em] text-[#ae1800]"
+        style={navFont}
+      >
+        For recruiters
+      </h2>
+      {faqs.map((item, i) => {
+        const open = openIndex === i;
+        return (
+          <div key={item.q} className="border-t border-[#201e1d]/40">
+            <button
+              type="button"
+              onClick={() => setOpenIndex(open ? null : i)}
+              className="flex w-full cursor-pointer items-center justify-between gap-4 py-5 text-left text-lg font-extrabold text-[#201e1d]"
+              style={navFont}
+            >
+              <span>{item.q}</span>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#ec3013"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="shrink-0 transition-transform duration-200"
+                style={{ transform: open ? 'rotate(90deg)' : 'rotate(0deg)' }}
+              >
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+            {open && (
+              <p className="max-w-[64ch] pb-6 text-base leading-relaxed text-[#201e1d]/78">
+                {item.a}
+              </p>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ContactSection() {
+  const [sent, setSent] = useState(false);
+
+  return (
+    <div id="contact" className="scroll-mt-20 px-6 py-12 sm:px-10 md:px-14 md:pb-16">
+      <h2
+        className="mb-5 text-[15px] uppercase tracking-[0.08em] text-[#ae1800]"
+        style={navFont}
+      >
+        Start a conversation
+      </h2>
+      <div className="mb-7 flex flex-wrap gap-x-7 gap-y-2 text-sm text-[#201e1d]/72">
+        <span>{profile.email}</span>
+        <span>{profile.phone}</span>
+        <a
+          href={profile.writingSamplesUrl}
+          target="_blank"
+          rel="noopener"
+          className="text-[#ae1800] hover:text-[#ec3013]"
+        >
+          Writing samples ↗
+        </a>
+      </div>
+
+      {sent ? (
+        <div className="border-t-2 border-[#ec3013] py-8">
+          <p className="mb-2 text-2xl font-extrabold" style={navFont}>
+            Thanks — message received.
+          </p>
+          <p className="text-base text-[#201e1d]/70">
+            I reply to every recruiter within two business days.
+          </p>
+        </div>
+      ) : (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setSent(true);
+          }}
+          className="grid max-w-[720px] grid-cols-1 gap-5 sm:grid-cols-2"
+        >
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="rk-name" className="text-xs text-[#201e1d]/70">
+              Your name
+            </label>
+            <input
+              id="rk-name"
+              required
+              className="min-h-9 border border-[#201e1d]/40 bg-[#eae9e9] px-2.5 py-1.5 text-sm text-[#201e1d] outline-none focus-visible:border-[#ec3013]"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="rk-co" className="text-xs text-[#201e1d]/70">
+              Company
+            </label>
+            <input
+              id="rk-co"
+              className="min-h-9 border border-[#201e1d]/40 bg-[#eae9e9] px-2.5 py-1.5 text-sm text-[#201e1d] outline-none focus-visible:border-[#ec3013]"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5 sm:col-span-2">
+            <label htmlFor="rk-email" className="text-xs text-[#201e1d]/70">
+              Work email
+            </label>
+            <input
+              id="rk-email"
+              type="email"
+              required
+              className="min-h-9 border border-[#201e1d]/40 bg-[#eae9e9] px-2.5 py-1.5 text-sm text-[#201e1d] outline-none focus-visible:border-[#ec3013]"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5 sm:col-span-2">
+            <label htmlFor="rk-msg" className="text-xs text-[#201e1d]/70">
+              The role
+            </label>
+            <textarea
+              id="rk-msg"
+              rows={3}
+              placeholder="Team, level, and what you're hiring for."
+              className="resize-y border border-[#201e1d]/40 bg-[#eae9e9] px-2.5 py-1.5 text-sm text-[#201e1d] outline-none focus-visible:border-[#ec3013]"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center bg-[#ec3013] px-3.5 py-2 text-sm font-extrabold text-[#f3f2f2] hover:bg-[#dd2b0f] active:bg-[#ae1800]"
+              style={navFont}
+            >
+              Send message
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}
+
+function Footer() {
+  return (
+    <div className="px-6 py-7 text-[13px] text-[#201e1d]/60 sm:px-10 md:px-14">
+      © 2026 {profile.brand} · {profile.email} · {profile.location}
+    </div>
   );
 }
 
 export default function HomePage() {
   return (
-    <main className="flex flex-col">
-      {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b bg-gradient-to-br from-background via-accent/30 to-background">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,hsl(var(--primary)/0.12),transparent)]" />
-        <div className="relative mx-auto max-w-4xl px-6 py-24 text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            <MapPin className="h-3 w-3" /> {profile.location}
-          </span>
-          <h1 className="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
-            {profile.name}
-          </h1>
-          <p className="mt-3 text-lg font-semibold text-primary">{profile.role}</p>
-          <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-            {profile.tagline}
-          </p>
-
-          {/* Skills */}
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-2">
-            {skills.map((skill) => (
-              <span
-                key={skill}
-                className="rounded-full border bg-background px-3 py-1 text-xs font-medium text-muted-foreground"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-
-          {/* Social links */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <SocialLink href={`mailto:${profile.email}`} icon={Mail} label="Email" />
-            <SocialLink href={profile.github} icon={Github} label="GitHub" />
-            <SocialLink href={profile.linkedin} icon={Linkedin} label="LinkedIn" />
-          </div>
-        </div>
-      </section>
-
-      <div className="mx-auto w-full max-w-5xl px-6 py-16 space-y-20">
-        {/* ── Experience ───────────────────────────────────────────── */}
-        <section>
-          <SectionHeader
-            icon={Briefcase}
-            title="Experience"
-            description="Roles I've held and the impact I delivered."
-            color="bg-blue-500/10 text-blue-600 dark:text-blue-400"
-          />
-          <div className="relative space-y-8 border-l border-border pl-8 dark:border-white/10">
-            {experience.map((job) => (
-              <div key={job.role + job.company} className="relative">
-                <span className="absolute -left-[2.35rem] top-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-primary bg-background" />
-                <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                  <h3 className="text-lg font-semibold">
-                    {job.role} ·{' '}
-                    <span className="text-primary">{job.company}</span>
-                  </h3>
-                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Calendar className="h-3 w-3" />
-                    {job.period}
-                    <span className="text-border">•</span>
-                    {job.location}
-                  </span>
-                </div>
-                <ul className="mt-3 space-y-1.5">
-                  {job.points.map((point, i) => (
-                    <li
-                      key={i}
-                      className="flex gap-2 text-sm text-muted-foreground leading-relaxed"
-                    >
-                      <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-primary/60" />
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── Projects ─────────────────────────────────────────────── */}
-        <section>
-          <SectionHeader
-            icon={FolderGit2}
-            title="Projects"
-            description="Selected work I've designed and built."
-            color="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-          />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project) => (
-              <Link
-                key={project.title}
-                href={project.href}
-                className="group flex flex-col gap-3 rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 dark:border-white/10"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="font-semibold text-base transition-colors duration-300 group-hover:text-primary">
-                    {project.title}
-                  </h3>
-                  <ExternalLink className="h-4 w-4 shrink-0 text-primary opacity-0 transition-all duration-300 group-hover:opacity-100" />
-                </div>
-                <p className="flex-1 text-sm text-muted-foreground leading-relaxed">
-                  {project.description}
-                </p>
-
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* ── Achievements ─────────────────────────────────────────── */}
-        <section>
-          <SectionHeader
-            icon={Trophy}
-            title="Achievements"
-            description="Milestones and recognition along the way."
-            color="bg-amber-500/10 text-amber-600 dark:text-amber-400"
-          />
-          <div className="grid gap-4 sm:grid-cols-2">
-            {achievements.map((achievement) => (
-              <div
-                key={achievement.title}
-                className="flex gap-4 rounded-xl border border-border bg-card p-5 text-card-foreground shadow-sm dark:border-white/10"
-              >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                  <Trophy className="h-4.5 w-4.5" />
-                </div>
-                <div>
-                  <div className="flex items-baseline gap-2">
-                    <h3 className="font-semibold text-sm">{achievement.title}</h3>
-                    <span className="text-xs font-medium text-muted-foreground">
-                      {achievement.year}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                    {achievement.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      {/* ── Footer strip ─────────────────────────────────────────── */}
-      <div className="border-t bg-muted/30">
-        <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-3 px-6 py-6 text-center text-sm text-muted-foreground sm:flex-row sm:text-left">
-          <span>Interested in working together?</span>
-          <Link
-            href={`mailto:${profile.email}`}
-            className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline"
-          >
-            Get in touch <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
+    <main className="w-full bg-[#f3f2f2]" style={navFont}>
+      <div className="w-full">
+        <Hero />
+        <FactTable />
+        <StatRow />
+        <Divider />
+        <CareerSection />
+        <Divider />
+        <EducationSection />
+        <Divider />
+        <FaqSection />
+        <Divider />
+        <ContactSection />
+        <Divider />
+        <Footer />
       </div>
     </main>
   );

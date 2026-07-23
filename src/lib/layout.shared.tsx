@@ -10,7 +10,7 @@ export const gitConfig = {
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: 'My Portfolio',
+      title: 'Ravichandra K',
       transparentMode: 'top',
     },
 
