@@ -1,45 +1,52 @@
-# Docsite using Fuma Docs
+# Ravichandra K — Portfolio & Docs
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+Personal site for Ravichandra K, Senior Technical Writer. Built with
+[Next.js](https://nextjs.org) and [Fumadocs](https://fumadocs.dev): a custom
+portfolio homepage plus a documentation section for project write-ups.
 
-Run development server:
+## Structure
+
+- `src/app/(home)` — the portfolio homepage: hero, career history, skills,
+  education, FAQ, and contact form. Content lives in `src/app/(home)/page.tsx`
+  as plain data objects near the top of the file — edit those to update the
+  page.
+- `src/app/docs` — the documentation layout and pages, rendered from
+  `content/docs/*.mdx` via Fumadocs MDX.
+- `src/app/api/search/route.ts` — the route handler for docs search.
+- `src/lib/layout.shared.tsx` — shared nav/header options (brand, links,
+  Résumé button) used by both the homepage and docs layouts.
+- `src/lib/source.ts` — the Fumadocs content source adapter
+  ([`loader()`](https://fumadocs.dev/docs/headless/source-api)).
+- `content/docs/` — MDX project write-ups (NASA APOD API, Akshaya Patra,
+  Outbound Policies).
+- `public/resume.pdf` — résumé served from the header's "Résumé (PDF)" button.
+
+## Development
 
 ```bash
+npm install
 npm run dev
-# or
-pnpm dev
-# or
-yarn dev
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+Open http://localhost:3000 to see the homepage, or http://localhost:3000/docs
+for the documentation section.
 
-## Explore
+Other scripts:
 
-In the project, you can see:
-
-- `lib/source.ts`: Code for content source adapter, [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access your content.
-- `lib/layout.shared.tsx`: Shared options for layouts, optional but preferred to keep.
-
-| Route                     | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `app/(home)`              | The route group for your landing page and other pages. |
-| `app/docs`                | The documentation layout and pages.                    |
-| `app/api/search/route.ts` | The Route Handler for search.                          |
+```bash
+npm run build        # production build
+npm run start         # serve the production build
+npm run lint           # eslint
+npm run types:check   # regenerate Fumadocs MDX + Next types, then type-check
+```
 
 ### Fumadocs MDX
 
-A `source.config.ts` config file has been included, you can customise different options like frontmatter schema.
+`source.config.ts` configures the MDX content source (frontmatter schema,
+etc.) — see the [Fumadocs MDX introduction](https://fumadocs.dev/docs/mdx)
+for details.
 
-Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
+## Learn more
 
-## Learn More
-
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Fumadocs](https://fumadocs.dev) - learn about Fumadocs
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Fumadocs](https://fumadocs.dev)
