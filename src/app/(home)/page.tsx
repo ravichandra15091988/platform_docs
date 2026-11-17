@@ -12,7 +12,7 @@ const profile = {
   role: 'Senior Technical Writer',
   headline: 'Docs people\nactually read.',
   tagline:
-    'A seasoned technical writer with 6+ years in software documentation and 14+ years across software and manufacturing. An engineering background sits behind every doc — turning complex products into clear, accurate technical content teams can trust.',
+    'A seasoned technical writer with 7+ years in software documentation and 15+ years across software and manufacturing. An engineering background sits behind every doc — turning complex products into clear, accurate technical content teams can trust.',
   email: 'ravi.metrockz@gmail.com',
   phone: '+91 83097 61339',
   location: 'Hyderabad, India',
@@ -24,11 +24,11 @@ const facts = [
   { label: 'Location', value: 'Hyderabad, India · GMT+5:30' },
   { label: 'Focus', value: 'API & product docs' },
   { label: 'Availability', value: 'Open to roles', accent: true },
-  { label: 'Experience', value: '6+ yrs writing' },
+  { label: 'Experience', value: '7+ yrs writing' },
 ];
 
 const stats = [
-  { value: '14+', label: 'years total experience' },
+  { value: '15+', label: 'years total experience' },
   { value: '+60%', label: 'user satisfaction, Google project' },
   { value: '+90%', label: 'document accuracy via peer review' },
   { value: '+25%', label: 'engagement on Wisely docs' },
