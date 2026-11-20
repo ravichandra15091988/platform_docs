@@ -1,0 +1,204 @@
+---
+title: Generating and Publishing API Documentation
+description: Installing the OpenAPI plugin, configuring docusaurus.config.ts, adding the Postman-exported spec, generating MDX pages, and matching the API version to 4.0.0.
+---
+
+The documentation site renders interactive API reference pages alongside the
+written guides. Those pages are **generated** from an OpenAPI specification
+exported from Postman, not hand-written. This document records how the OpenAPI
+tooling was installed, how `docusaurus.config.ts` was configured, where the spec
+was added, how the `.mdx` pages were produced, and how the API reference version
+was matched to the main product version, 4.0.0.
+
+<Callout title="Engineering reference">
+  This is an engineering reference for people who maintain the API reference. The
+  generated files it describes must not be edited by hand.
+</Callout>
+
+## 1. Install the OpenAPI dependencies
+
+Two packages do the work
+
+- a plugin that turns a spec into MDX pages, and
+- a theme that renders those pages with the "Try it" console. Install both of them.
+
+```bash
+cd corespan_docs
+npm install docusaurus-plugin-openapi-docs@^5.0.1 docusaurus-theme-openapi-docs@^5.0.1
+```
+
+| Package | Role |
+| --- | --- |
+| `docusaurus-plugin-openapi-docs` | Reads an OpenAPI spec and generates the `.mdx` reference pages |
+| `docusaurus-theme-openapi-docs` | Renders the generated pages, including the request console and schema views |
+
+## 2. Configure docusaurus.config.ts
+
+Three changes wire the tooling into the site.
+
+**Register the plugin.** Add `docusaurus-plugin-openapi-docs` to the `plugins`
+array with one entry per API set under `config`. The Composer API is configured
+like this:
+
+```ts
+[
+  'docusaurus-plugin-openapi-docs',
+  {
+    id: 'api',
+    docsPluginId: 'classic', // generate into the classic docs plugin
+    config: {
+      composer_versioned: {
+        specPath: 'docs/api_examples/composer_apis.yaml',
+        outputDir: 'docs/composer/api_versioned/4.0.0',
+        baseUrl: '/docs/reference/composer/api_versioned/composer-apis',
+        downloadUrl: '/docs/openapi-spec/composer_apis.yaml',
+        showSchemas: true,
+        hideSendButton: false,
+        sidebarOptions: {
+          groupPathsBy: 'tag',
+          categoryLinkSource: 'tag',
+        },
+        version: '4.0.0',
+        label: 'v4.0.0',
+      },
+      // apiTwo: { … } for the AI Studio (workbench) spec
+    },
+  },
+],
+```
+
+Key fields:
+
+- `specPath` points at the source spec (see the next section).
+- `outputDir` is where the generated `.mdx` pages are written — note the `4.0.0`
+  segment, which carries the version into the output path.
+- `groupPathsBy: 'tag'` groups endpoints into sidebar categories by their
+  OpenAPI tag, and `categoryLinkSource: 'tag'` gives each category a landing page
+  built from the tag description.
+- `downloadUrl` is the "Download spec" link on the generated pages. It points at
+  a protected endpoint (`/docs/openapi-spec/composer_apis.yaml`), not a static
+  file, so the spec is served only to an authorized reader.
+
+**Register the theme.** Add `docusaurus-theme-openapi-docs` to the `themes`
+array.
+
+**Route doc pages through the API item component.** In the `docs` preset, set
+`docItemComponent: '@theme/ApiItem'` so the generated pages render with the
+OpenAPI theme instead of the default doc layout.
+
+## 3. Add the OpenAPI spec exported from Postman
+
+The Composer API is maintained in the Postman app. To publish it:
+
+1. In Postman, open the Composer API definition and export it as an **OpenAPI
+   3.0** specification in YAML.
+2. Save the exported file into the site at the path the plugin reads:
+
+   ```text
+   docs/api_examples/composer_apis.yaml
+   ```
+
+   Specs for each API live together in `docs/api_examples/`. The AI Studio spec,
+   for example, is `docs/api_examples/workbench_apis.yaml`.
+
+3. Set the spec's `info.version` to `4.0.0` so the version inside the document
+   matches the version the site publishes it under.
+
+Re-exporting from Postman and overwriting this file is how the reference is kept
+in sync with the API: the next generation step rebuilds the pages from it.
+
+## 4. Generate the MDX reference pages
+
+Run the generation command from `corespan_docs/`. The project wraps it in an
+`npm` script that first runs a pre-processing step
+(`scripts/fix-composer-token-demos.js`) and then calls the plugin:
+
+```bash
+npm run gen-api-docs -- all          # regenerate every configured API set
+# or target one set by its config key:
+npm run gen-api-docs -- composer_versioned
+```
+
+This reads `composer_apis.yaml` and writes the full reference into
+`docs/composer/api_versioned/4.0.0/`, including:
+
+- one `*.api.mdx` page per endpoint, plus its companion `ParamsDetails.json`,
+  `RequestSchema.json`, and `StatusCodes.json` data files
+- a `*.tag.mdx` landing page per tag group
+- the `composer-apis.info.mdx` introduction page
+- a generated `sidebar.js` describing the endpoint tree
+
+To regenerate cleanly, remove the output first:
+
+```bash
+npm run clean-api-docs -- all
+```
+
+The generated files are build artifacts. Edit the Postman spec and regenerate
+rather than editing the `.mdx` pages, because the next generation overwrites
+them. Hand-authored introduction pages (such as `before-you-begin.mdx`,
+`authentication.mdx`, and `make-your-first-api-call.mdx`) live in the same
+directory and are referenced explicitly from the sidebar so the generator leaves
+them in place.
+
+## 5. Wire the generated pages into the sidebar
+
+The generated endpoint tree is imported into `sidebars.ts` and combined with the
+hand-authored introduction pages under a dedicated `composerSidebar1` sidebar:
+
+```ts
+import api_versionedSidebar from './docs/composer/api_versioned/4.0.0/sidebar';
+// …
+items: [
+  { /* Introduction category: before-you-begin, authentication, … */ },
+  ...api_versionedSidebar.slice(1), // generated tag sections
+],
+```
+
+`slice(1)` drops the generated introduction entry so the hand-authored
+Introduction category is used instead, while every generated tag section is kept.
+
+## 6. Match the API docs version to 4.0.0
+
+The API reference is versioned independently of the written docs, and it is
+deliberately aligned to the main product's development version, **4.0.0** — the
+same version the `docs/` folder is labeled with (*4.0.0 (Development)*). The
+version is set consistently in four places so the dropdown, URLs, and pages all
+agree:
+
+1. **The plugin config** sets `version: '4.0.0'` and `label: 'v4.0.0'`, and the
+   `outputDir` ends in `4.0.0`.
+2. **The spec** sets `info.version: 4.0.0`.
+3. **`docs/composer/api_versioned/versions.json`** registers the version for the
+   version selector:
+
+   ```json
+   [
+     {
+       "version": "4.0.0",
+       "label": "v4.0.0",
+       "baseUrl": "/docs/reference/composer/api_versioned/4.0.0/composer-apis"
+     }
+   ]
+   ```
+
+4. **`sidebars.ts`** builds the version controls from that file:
+
+   ```ts
+   import composerVersions from './docs/composer/api_versioned/versions.json';
+   import { versionSelector, versionCrumb } from 'docusaurus-plugin-openapi-docs/lib/sidebars/utils';
+   // …
+   { type: 'html', value: versionSelector(composerVersions) }, // version dropdown
+   { type: 'html', value: versionCrumb('v4.0.0') },            // version breadcrumb
+   ```
+
+To publish a new API version later, generate into a new `outputDir` (for example
+`.../api_versioned/4.1.0`), add an entry to `versions.json`, and import that
+version's generated `sidebar.js` — the same pattern this 4.0.0 setup follows.
+
+## Related
+
+- [Building and Deploying the Docs Site](/docs/docusaurus/build-and-deploy) — prerequisites,
+  the build, and how documentation versions are configured.
+- [Authentication on Docusaurus](/docs/docusaurus/authentication) — how the spec download and
+  generated pages are gated once deployed.

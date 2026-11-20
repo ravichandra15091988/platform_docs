@@ -39,6 +39,108 @@
   --rk-tag-text: #f8f4f4;
 }
 
+/* =====================================================================
+   Colour schemes — switchable accent palettes (data-color-scheme on <html>)
+   Each scheme retints the primary/accent/ring tokens for light & dark.
+   --rk-dot is the swatch shown in the theme panel.
+   ===================================================================== */
+:root[data-color-scheme='slate'] {
+  --color-fd-primary: hsl(256, 88%, 64%);
+  --color-fd-ring: hsl(256, 88%, 64%);
+  --rk-dot: hsl(256, 88%, 64%);
+}
+.dark[data-color-scheme='slate'] {
+  --color-fd-primary: hsl(256, 90%, 74%);
+  --color-fd-ring: hsl(256, 90%, 74%);
+  --rk-dot: hsl(256, 90%, 74%);
+}
+
+:root[data-color-scheme='warm'] {
+  --color-fd-primary: hsl(25, 84%, 47%);
+  --color-fd-ring: hsl(25, 84%, 47%);
+  --rk-dot: hsl(25, 84%, 47%);
+}
+.dark[data-color-scheme='warm'] {
+  --color-fd-primary: hsl(28, 90%, 58%);
+  --color-fd-ring: hsl(28, 90%, 58%);
+  --rk-dot: hsl(28, 90%, 58%);
+}
+
+:root[data-color-scheme='forest'] {
+  --color-fd-primary: hsl(142, 64%, 36%);
+  --color-fd-ring: hsl(142, 64%, 36%);
+  --rk-dot: hsl(142, 64%, 36%);
+}
+.dark[data-color-scheme='forest'] {
+  --color-fd-primary: hsl(142, 62%, 50%);
+  --color-fd-ring: hsl(142, 62%, 50%);
+  --rk-dot: hsl(142, 62%, 50%);
+}
+
+:root[data-color-scheme='midnight'] {
+  --color-fd-primary: hsl(222, 83%, 55%);
+  --color-fd-ring: hsl(222, 83%, 55%);
+  --rk-dot: hsl(222, 83%, 55%);
+}
+.dark[data-color-scheme='midnight'] {
+  --color-fd-primary: hsl(222, 90%, 68%);
+  --color-fd-ring: hsl(222, 90%, 68%);
+  --rk-dot: hsl(222, 90%, 68%);
+}
+
+:root[data-color-scheme='sunset'] {
+  --color-fd-primary: hsl(8, 82%, 55%);
+  --color-fd-ring: hsl(8, 82%, 55%);
+  --rk-dot: hsl(8, 82%, 55%);
+}
+.dark[data-color-scheme='sunset'] {
+  --color-fd-primary: hsl(8, 88%, 65%);
+  --color-fd-ring: hsl(8, 88%, 65%);
+  --rk-dot: hsl(8, 88%, 65%);
+}
+
+:root[data-color-scheme='ocean'] {
+  --color-fd-primary: hsl(199, 89%, 45%);
+  --color-fd-ring: hsl(199, 89%, 45%);
+  --rk-dot: hsl(199, 89%, 45%);
+}
+.dark[data-color-scheme='ocean'] {
+  --color-fd-primary: hsl(199, 90%, 56%);
+  --color-fd-ring: hsl(199, 90%, 56%);
+  --rk-dot: hsl(199, 90%, 56%);
+}
+
+/* =====================================================================
+   Headings follow the selected colour scheme (accent = --color-fd-primary)
+   ===================================================================== */
+.prose :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--color-fd-primary);
+}
+
+/* =====================================================================
+   Contrast — divider/border strength (data-contrast on <html>)
+   ===================================================================== */
+:root[data-contrast='soft'] {
+  --color-fd-border: hsla(0, 0%, 80%, 28%);
+}
+:root[data-contrast='strong'] {
+  --color-fd-border: hsla(0, 0%, 60%, 70%);
+}
+:root[data-contrast='high'] {
+  --color-fd-border: hsl(0, 0%, 44%);
+  --color-fd-muted-foreground: hsl(0, 0%, 30%);
+}
+.dark[data-contrast='soft'] {
+  --color-fd-border: hsla(0, 0%, 40%, 10%);
+}
+.dark[data-contrast='strong'] {
+  --color-fd-border: hsla(0, 0%, 55%, 45%);
+}
+.dark[data-contrast='high'] {
+  --color-fd-border: hsl(0, 0%, 58%);
+  --color-fd-muted-foreground: hsl(0, 0%, 82%);
+}
+
 .dark {
   --color-fd-background: hsl(0, 0%, 7.04%);
   --color-fd-foreground: hsl(0, 0%, 92%);

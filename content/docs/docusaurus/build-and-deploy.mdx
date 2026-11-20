@@ -1,0 +1,235 @@
+---
+title: Building and Deploying the Docsaurus Site via Vercel
+description: Prerequisites, local setup, pushing to Bitbucket, connecting Vercel, and serving the site at corespan.ai/docs.
+---
+
+This document records how the Corespan documentation site was built from an empty
+machine and deployed to production. It includes the prerequisites, how the dependencies were
+installed locally, how the project was pushed to Bitbucket, how Bitbucket was
+connected to Vercel for the build, and how the site was published at
+`corespan.ai/docs`.
+
+<Callout title="Engineering & operations reference">
+  This is an engineering and operations reference for people who maintain or
+  re-create the documentation deployment, not an end-user guide.
+</Callout>
+
+## 1. Prerequisites
+
+Install and prepare the following before starting:
+
+- **Node.js 20 or later.** The project declares `"engines": { "node": ">=20.0" }`,
+  and the build fails on earlier versions. Installing Node also installs `npm`.
+- **npm.** The repository commits a `package-lock.json`, so `npm` is the package
+  manager of record. (Some older notes show `yarn` commands; the lockfile is the
+  authoritative choice — use `npm`.)
+- **Git.** Required to version the project and push it to Bitbucket.
+- **A Bitbucket account** with permission to create a repository.
+- **A Vercel account** connected to that Bitbucket workspace.
+- **A code editor** such as Visual Studio Code.
+
+## 2. Install the dependencies on the local desktop
+
+First, install the toolchain, then install the project packages.
+
+1. **Install Node.js and npm.** Download the Node.js 20 LTS installer from
+   [nodejs.org](https://nodejs.org) and run it. Confirm both tools are on the
+   path:
+
+   ```bash
+   node --version   # v20.x or later
+   npm --version
+   ```
+
+2. **Install Git** from [git-scm.com](https://git-scm.com) and set the identity
+   used for commits:
+
+   ```bash
+   git --version
+   git config --global user.name "Your Name"
+   git config --global user.email "you@corespan.ai"
+   ```
+
+3. **Install the project packages.** The Docusaurus project lives one level down,
+   in `corespan_docs/`. There is no `package.json` at the repository root, so
+   installing from the root does nothing. Change into the project directory
+   first:
+
+   ```bash
+   cd corespan_docs
+   npm install
+   ```
+
+4. **Run the site locally** to confirm the install. The `start` and `build`
+   scripts both compile the search Web Worker first (`build:worker`), so a plain
+   Docusaurus command is not enough:
+
+   ```bash
+   npm start          # dev server at http://localhost:3000/docs/
+   npm run build      # production build into corespan_docs/build/
+   npm run serve      # serve the production build locally
+   ```
+
+   Create a `corespan_docs/.env.local` file with the Supabase and site variables
+   (`SUPABASE_URL`, `SUPABASE_PUBLISHABLE_DEFAULT_KEY`, `DOC_SITE_URL`, and the
+   related keys) before running the dev server, because Docusaurus loads that
+   file automatically outside production.
+
+## 3. Install and configure documentation versions
+
+Docusaurus versioning keeps a browsable snapshot of the documentation for each
+released product version, while the live `docs/` folder holds the in-progress
+version. The configuration lives in `docusaurus.config.ts`, and the snapshots are
+generated files committed to the repository.
+
+How versioning is set up in this project:
+
+- **The `docs/` folder is the "current" version.** In the `docs` preset's
+  `versions` map it is mapped to the development release, labeled
+  **4.0.0 (Development)**, served under the `next` path
+  (`/docs/reference/next/…`), and marked with an `unreleased` banner.
+- **Released snapshots are separate directories.** Each cut version lives in
+  `versioned_docs/version-<X.Y.Z>/`, its sidebar in
+  `versioned_sidebars/version-<X.Y.Z>-sidebars.json`, and the list of versions to
+  build in `versions.json`.
+- **`lastVersion: '3.4.1'` sets the default.** Version 3.4.1 is what a visitor
+  sees first, and its `path: '/'` serves it at the base of the reference route
+  (`/docs/reference/…`) rather than under a version segment. Older versions
+  resolve under their number, such as `/docs/reference/3.4.0/…`.
+
+To cut a new version:
+
+1. Finish editing the pages in `docs/` for the release.
+2. Run the version command from `corespan_docs/`:
+
+   ```bash
+   npm run docusaurus docs:version 3.4.1
+   ```
+
+   This copies `docs/` into `versioned_docs/version-3.4.1/`, copies the current
+   sidebar into `versioned_sidebars/version-3.4.1-sidebars.json`, and prepends
+   `"3.4.1"` to `versions.json`.
+
+3. Update the `versions` map in `docusaurus.config.ts` to set the label, path,
+   `lastVersion`, and any banner for the new release and the current development
+   version.
+4. Commit the generated `versioned_docs/`, `versioned_sidebars/`, and
+   `versions.json` together with the configuration change.
+
+A version directory is built only when `versions.json` lists it. For example,
+`versioned_docs/version-3.2.0/` exists on disk but is absent from `versions.json`,
+so it is not served. Removing a version's entry from `versions.json` drops it from
+the build without deleting its files.
+
+## 4. Initialize Git and push to Bitbucket
+
+With the project running locally, put it under version control and publish it to
+Bitbucket.
+
+1. **Create the repository on Bitbucket.** In the Bitbucket workspace, create a
+   new, empty repository (no README, no `.gitignore`) and copy its clone URL.
+
+2. **Initialize Git in the repository root** — the directory that contains
+   `corespan_docs/`, not `corespan_docs/` itself — so the whole project is
+   tracked. A Docusaurus `.gitignore` already excludes `node_modules/`, `build/`,
+   and `.docusaurus/`; confirm those are ignored so generated output is never
+   committed.
+
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit: Docusaurus documentation site"
+   ```
+
+3. **Add the Bitbucket remote and push** the default branch:
+
+   ```bash
+   git branch -M main
+   git remote add origin https://<user>@bitbucket.org/<workspace>/<repo>.git
+   git push -u origin main
+   ```
+
+   Bitbucket prompts for credentials on the first push. Use an app password, not
+   the account password, because Bitbucket requires one for Git over HTTPS.
+
+## 5. Connect the Bitbucket repository to Vercel
+
+Vercel runs the build on every push. The Vercel project for this site is named
+`corespan_documentation` and its production hostname is `zensical-test.vercel.app`.
+
+1. **Import the repository.** In the Vercel dashboard, select **Add New > Project**,
+   choose the Bitbucket workspace, and import the repository pushed in the
+   previous step. Authorize Vercel to access Bitbucket if prompted.
+
+2. **Set the project root directory.** Because the project lives in a
+   subdirectory, set **Root Directory** to `corespan_docs`. This is the single
+   most important setting — without it, Vercel builds from the repository root,
+   finds no `package.json`, and fails.
+
+3. **Confirm the build settings.** Vercel detects Docusaurus, but verify:
+
+   | Setting | Value |
+   | --- | --- |
+   | Framework preset | Docusaurus |
+   | Install command | `npm install` |
+   | Build command | `npm run build` |
+   | Output directory | `build` |
+   | Node.js version | 20.x |
+
+   The `npm run build` script is deliberate because besides the Docusaurus build, it
+   compiles the search worker and runs the post-build scripts that move the
+   protected search index and page chunks out of the public output. Overriding
+   the build command with a bare `docusaurus build` would ship that content
+   unprotected.
+
+4. **Add the environment variables.** Under **Settings > Environment Variables**,
+   add the same keys used in `.env.local` — `SUPABASE_URL`,
+   `SUPABASE_PUBLISHABLE_DEFAULT_KEY`, `DOC_SITE_URL`, `CORESPAN_SITE_URL`,
+   `AUTH_COOKIE_DOMAIN` (set to `.corespan.ai` in production), and the chat and
+   PDF variables — for the Production environment. Nothing is hardcoded, so a
+   preview deployment reads whatever its own environment provides.
+
+5. **Deploy.** Trigger the first deployment. On success, Vercel serves the build
+   at the production alias `projectname.vercel.app`. Every later push to `main`
+   rebuilds and redeploys automatically.
+
+## 6. Configure the domain and serve the site at corespan.ai/docs
+
+The site is a *zone*. The public path `corespan.ai/docs` is not a Vercel custom
+domain on this project directly; it is produced by the main website's Next.js
+application rewriting `/docs/*` to this project's Vercel alias, combined with the
+site's own `baseUrl`.
+
+1. **Keep `baseUrl` set to `/docs/`** in `docusaurus.config.ts`. Docusaurus uses
+   `baseUrl` only to prefix the URLs it writes into the HTML, it still writes its
+   files flat. The outer `/docs` segment is the zone and the inner segment is the
+   documentation plugin's `routeBasePath`, so a page resolves to
+   `/docs/reference/<version>/…`.
+
+2. **Add the rewrite in the main site.** In the `frontend` repository's
+   `next.config.ts`, a rewrite points `/docs/*` at this project's Vercel
+   production alias and strips the `/docs` prefix before the request arrives,
+   because Docusaurus already prefixes its internal links with `baseUrl`. This
+   rewrite is what makes `corespan.ai/docs` resolve to the deployed documentation.
+
+3. **Attach the custom domain in Vercel (optional alias).** In
+   **Settings > Domains** on the `corespan_documentation` project, add
+   `docs.corespan.ai`. That hostname resolves but then `301`-redirects inward to
+   `corespan.ai/docs`, so the canonical public URL stays under the main domain.
+
+4. **Verify the published site.** Because the client-side auth guard redirects
+   before a browser can show the page source, verify with `curl`, not a browser:
+
+   ```bash
+   curl -s https://www.corespan.ai/docs | wc -c
+   ```
+
+   Roughly 1.5 KB is the empty, signed-out shell and is correct. After a deploy,
+   watch the response `etag` change rather than the byte count, because the edge
+   serves the previous copy for up to a minute.
+
+## Related
+
+- [Authentication on Docusaurus](/docs/docusaurus/authentication) — how the deployed site
+  gates access once it is live.
+- [Generating and Publishing API Documentation](/docs/docusaurus/api-documentation) — generating and publishing the API reference documentation.

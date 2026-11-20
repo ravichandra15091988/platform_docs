@@ -1,5 +1,5 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { BookIcon } from 'lucide-react';
+import { ThemePanel } from '@/components/theme-panel';
 
 export const gitConfig = {
   user: 'Platform Docs',
@@ -13,7 +13,9 @@ export function baseOptions(): BaseLayoutProps {
       title: 'Ravichandra K',
       transparentMode: 'top',
     },
-
+    themeSwitch: {
+      component: <ThemePanel />,
+    },
   };
 }
 

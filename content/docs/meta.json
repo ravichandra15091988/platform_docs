@@ -1,0 +1,10 @@
+{
+  "pages": [
+    "index",
+    "nasa_api",
+    "akshaya_patra",
+    "outbound",
+    "mkdocs",
+    "docusaurus"
+  ]
+}

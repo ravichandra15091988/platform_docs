@@ -1,0 +1,212 @@
+---
+title: Authentication on Docusaurus
+description: How the Corespan documentation site gates access with Supabase, a client render guard, and server-side protected assets.
+---
+
+This document explains how authentication is implemented on the Corespan
+documentation site. The site is a Docusaurus v3 static site, but a static site
+cannot keep a secret on its own: every file in a normal build is a public asset
+that any unauthenticated request can download. The gate is therefore built from
+three independent mechanisms that each cover a different failure mode. Read all
+three before changing any of them.
+
+<Callout title="Engineering reference">
+  This is an engineering reference for people maintaining the documentation site,
+  not an end-user guide. It describes how the site enforces the `docs` access
+  claim, not how a reader signs in.
+</Callout>
+
+## The identity provider
+
+Authentication reuses the shared Corespan Customer Supabase project
+— the same project the marketing website and the
+software portal use. The documentation site does **not** run a second identity
+system.
+
+- The browser Supabase client is created in
+  `src/components/Auth/SupabaseContext.tsx` from two environment variables,
+  `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_DEFAULT_KEY` (the anon key).
+- Single sign-on with the main site works through a shared cookie. The client
+  sets `cookieOptions.domain` to `AUTH_COOKIE_DOMAIN`, which is empty on
+  localhost and `.corespan.ai` in production, so a session established on the
+  marketing site is visible to the documentation site.
+- Access to the documentation is carried as a claim inside the JSON Web Token
+  (JWT): `app_access` must include the string `docs`. A signed-in user without
+  that claim is authenticated but not authorized for the documentation.
+
+### Grants take effect only on a new token
+
+A grant of the `docs` claim is written to the user's account, but the running
+browser keeps using the access token it already holds. The new claim appears
+only after the token is refreshed — in practice, after the user signs out and
+back in. A grant applied to a currently signed-in user therefore looks like it
+failed silently, when it has in fact succeeded.
+
+## Mechanism 1: the client render gate
+
+`src/components/Auth/ProtectedRoute.tsx` decides what the browser **renders**.
+`src/theme/Root.tsx` wraps the whole application in `<AuthProvider>` (the session
+provider) and then `<ProtectedRoute>`, so every page passes through the guard.
+
+The guard reads `{ session, isLoading }` from the auth context, decodes the JWT
+payload, and checks for `docs` in `app_access`:
+
+- If there is no session, it redirects to the login page.
+- If there is a session without the `docs` claim, it renders a "No documentation
+  access" card instead of the page.
+- If the claim is present, it renders the page.
+
+This is a **UI gate only**. It decides whether a signed-in browser displays a
+page. It does nothing to decide which files the server sends, so on its own it
+does not stop a direct, unauthenticated request for the static assets a page is
+built from. Mechanisms 2 and 3 cover that gap.
+
+### Two traps that have both shipped
+
+Two mistakes in this file have each reached production. Both are easy to
+reintroduce, so they are called out here.
+
+**The loading branch must return `null`, never `children`.** The `isClient` flag
+is `false` during the static build. If the guard returns `children` while
+`isClient` is `false`, every protected page is prerendered into the `.html`
+files. The browser still redirects to the login page afterward, so the site
+appears to work — but the content was already sent in the HTML. The safe form
+splits the two conditions: show a spinner on `isLoading`, but return `null`
+whenever `!isClient`, because only `!isClient` affects the build.
+
+**Compare paths with `useBaseUrl`, not raw strings.** The site runs under a
+`baseUrl` of `/docs/`, so `location.pathname` carries the full path, such as
+`/docs/login`. A comparison against a bare `/login` never matches once `baseUrl`
+is not `/`, which once made every signed-out visitor hit the documentation 404.
+Resolve literal paths through `useBaseUrl` so the prefix is included.
+
+## Mechanism 2: build-time asset protection
+
+`docs build` writes protected content into several public files. Post-build
+scripts move those files out of the public `build/` output before the site
+deploys. Skip these scripts and every word of the documentation ships as a
+static asset that no gate ever sees.
+
+The build (`npm run build`) runs these steps after Docusaurus finishes:
+
+| Script | What it protects |
+| --- | --- |
+| `scripts/protect-search-index.js` | The Orama full-text search index (`orama-search-index-current.json.gz`), a complete dump of every page's title and body |
+| `scripts/protect-doc-chunks.js` | The per-page route chunks under `build/assets/js/` that carry real documentation content |
+
+Each script moves its files out of `build/` and into a gitignored directory
+under `api/` that is regenerated on every build. Because a static file on disk
+always wins over a rewrite, the content has to be **gone** from `build/` for the
+server-side gate to take effect.
+
+Two related protections run inside the Docusaurus build itself, configured in
+`docusaurus.config.ts`:
+
+- The `redact-orama-global-data` plugin strips the raw documentation corpus that
+  the search plugin would otherwise inline into `main.js`, the one chunk every
+  visitor downloads before signing in.
+- The `protectDocChunksPlugin` inspects each emitted chunk's module graph and
+  lists the filenames that contain documentation content, so
+  `protect-doc-chunks.js` knows which content-hashed files to move.
+
+<Callout type="warn" title="Do not protect the pages or blog plugin stub chunks">
+  Each content plugin writes a small descriptor stub that loads unconditionally at
+  application boot, before the render gate knows whether a session exists. Moving
+  that stub behind authentication returns `401` on first load for every signed-out
+  visitor and blanks the entire site. The exclusion list and the reasoning live in
+  the long comment above `protectDocChunksPlugin` in `docusaurus.config.ts`. Read
+  it before changing the protected directories.
+</Callout>
+
+## Mechanism 3: the server-side asset gate
+
+The files that mechanism 2 moves out of the public build are served back only to
+an authorized reader. Two shared files do this work for every protected asset:
+
+- `api/_lib/verifyDocsAccess.ts` reads the Supabase session from the request
+  cookies and returns the HTTP status to reject with, or `null` when access is
+  granted. It returns `401` when there is no user and `403` when the user lacks
+  the `docs` claim.
+- `api/_lib/serveProtectedAsset.ts` calls `verifyDocsAccess` first and streams
+  the requested file only when access is granted. It accepts either a fixed path
+  or a resolver function that chooses a file per request, which is how one
+  endpoint can serve any one of the content-hashed chunks.
+
+The protected-asset endpoints — the documentation PDF, the search index, the
+OpenAPI specs, and the per-page chunks — are thin wrappers around
+`serveProtectedAsset`. Change the shared files to change the access rules, not
+each endpoint.
+
+### Fail closed on purpose
+
+`verifyDocsAccess` treats a token it cannot read as **not** proof of the `docs`
+claim and denies the request. This is deliberate and differs from the render
+gate: the client guard treats an unparseable token as access-granted because the
+worst case there is only a page the user is denied on the next real check, but a
+server response is the actual access decision and defaults to deny.
+
+`serveProtectedAsset` also sets `Cache-Control: private, no-store` before any
+early return, so a shared cache cannot replay a `401` denial — or a granted
+response — from one reader to another.
+
+## How the zone and the prefix fit together
+
+The documentation site is a *zone*: the `frontend` repository rewrites
+`/docs/*` to this project and strips the `/docs` prefix before the request
+arrives. Two prefixes are in play, and they are not the same thing:
+
+- `baseUrl: "/docs/"` sets where the site lives on the domain.
+- `routeBasePath: "reference"` sets where the documentation plugin's pages live
+  within the site.
+
+Both are load-bearing, and `baseUrl` is why the render gate must resolve paths
+through `useBaseUrl`. In production, `vercel.json` rewrites each protected URL —
+the search index, the PDF, the OpenAPI specs, and the `/assets/js/:file`
+chunks — to its serverless endpoint, which runs the server-side gate.
+
+## Environment variables
+
+Nothing is hardcoded, so a preview deployment reads whatever its environment
+provides. The variables most relevant to authentication are:
+
+| Variable | Purpose |
+| --- | --- |
+| `SUPABASE_URL` | Supabase project URL, used by both the browser and server clients |
+| `SUPABASE_PUBLISHABLE_DEFAULT_KEY` | Supabase anon key for the browser client |
+| `AUTH_COOKIE_DOMAIN` | Cookie domain for single sign-on; empty on localhost, `.corespan.ai` in production |
+| `DOC_SITE_URL` | Public documentation site URL |
+| `CORESPAN_SITE_URL` | Target of the "Return to Dashboard" link on the access-blocked card |
+| `EMAIL_REDIRECT_TO` | Supabase magic-link redirect; must match the Supabase auth settings |
+
+## Verifying the gate
+
+Verify with `curl`, never a browser. The client-side redirect fires before the
+page source can be viewed, so a browser shows the login page and hides whatever
+the server actually sent. `curl` sends no cookie and receives the edge-cached
+response, which is identical for every reader.
+
+Check that the documentation home page returns only the empty shell:
+
+```bash
+curl -s https://www.corespan.ai/docs | wc -c
+```
+
+Roughly 1.5 KB is the empty shell and is correct. Roughly 27 KB means content is
+leaking into the prerendered HTML.
+
+Check that a signed-out request for a protected asset is rejected with a status
+code, not served and not redirected:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://www.corespan.ai/docs/assets/js/<chunk>.js
+```
+
+The expected result is `401`. After a deployment, watch the `etag` header change
+rather than the byte count: the edge serves the previous copy for up to a
+minute, which has produced false alarms in both directions.
+
+## Related
+
+- [Building and Deploying the Docs Site](/docs/docusaurus/build-and-deploy) — prerequisites,
+  the build, and how documentation versions are configured.
+- [Publishing API Documentation](/docs/docusaurus/api-documentation) — generating the API reference documentation.

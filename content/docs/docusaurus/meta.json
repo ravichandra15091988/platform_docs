@@ -1,0 +1,8 @@
+{
+  "title": "Static Site Generator (Docusaurus)",
+  "pages": [
+    "build-and-deploy",
+    "api-documentation",
+    "authentication"
+  ]
+}
